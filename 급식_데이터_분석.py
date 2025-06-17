@@ -29,7 +29,7 @@ if not os.path.exists(font_path):
 font_manager.fontManager.addfont(font_path)
 
 # 객관식 항목 시각화
-objective_columns = ['학년', '이번주 만족도', '이번주 가장 좋았던 급식', '잔반 비율', '수면시간']
+objective_columns = ['학년', '이번주 만족도', '잔반 비율', '수면시간']
 for col in objective_columns:
     if col in df.columns:
         value_counts = df[col].value_counts().reset_index()
@@ -43,6 +43,34 @@ for col in ['이번주 만족도', '잔반 비율']:
         pie_data = df[col].value_counts().reset_index()
         pie_data.columns = [col, '비율']
         fig = px.pie(pie_data, names=col, values='비율', title=f'{col} 비율', hole=0.4)
+        st.plotly_chart(fig)
+
+if '이번주 가장 좋았던 급식' in df.columns:
+    menu_col = df['이번주 가장 좋았던 급식'].dropna().astype(str)
+    week1_menus = [
+    "월요일 - 마라탕, 미니육전, 초코우유, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "화요일 - 순대국, 대구까스, 파인애플, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "수요일 - 치킨꿔바로우, 찹쌀약과, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "목요일- 찹스테이크, 산양요구르트, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드"
+]
+    week2_menus = [
+    "월요일 - 전주식콩나물국밥, 된장불고기, 바나나우유", "화요일 - 냉메밀국수, 알밥, 돈가스, 타코야끼, 주스", "수요일 - 육개장, 탕평채, 웅떡웅떡, 라임레몬주스, 금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)", "목요일- 카레라이스, 왕만두, 큐브카프레제, 감자스낵", "금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)"
+]
+    
+    week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
+    week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
+
+    week_data = {
+        '1주차': week1,
+        '2주차': week2
+    }
+
+    for week_name, data in week_data.items():
+        value_counts = data.value_counts().reset_index()
+        value_counts.columns = ['급식', '응답 수']
+        fig = px.bar(
+            value_counts,
+            x='급식', y='응답 수',
+            title=f'[{week_name}] 가장 좋았던 급식 응답 분포',
+            labels={'급식': '급식 메뉴'}
+        )
         st.plotly_chart(fig)
 
 # 서술형 응답 처리
@@ -108,7 +136,7 @@ for i in range(n_clusters):
     cluster_names[i] = cluster_keyword
 
     unique_originals = cluster_data[['원본문장']].drop_duplicates().reset_index(drop=True)
-    st.write(f'\n[군집 {i} - "{cluster_keyword}"] 원본문장 목록 (총 {len(unique_originals)}건):')
+    with st.expander(f'\n[군집 {i} - "{cluster_keyword}"] 응답 보기(총 {len(unique_originals)}건):')
     for j, row in unique_originals.iterrows():
         st.write(f'- {row["원본문장"]}')
 
