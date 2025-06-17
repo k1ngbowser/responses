@@ -18,6 +18,13 @@ df = pd.read_csv(file_path, encoding='utf-8')
 # 데이터 확인
 st.write(df.head())
 
+# 폰트 파일 경로
+font_path = 'GmarketSansTTFLight.ttf'
+font_name = plt.matplotlib.font_manager.FontProperties(fname=font_path).get_name()
+
+plt.rcParams['font.family'] = font_name
+# rc('font', family=font_name)
+
 # 객관식
 if '학년' in df.columns:
     st.write(df['학년'].value_counts())
