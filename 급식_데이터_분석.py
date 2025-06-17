@@ -10,6 +10,10 @@ from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
 import numpy as np
 from sklearn.decomposition import PCA
+from matplotlib import font_manager
+import urllib.request
+import os
+
 
 file_path = '급식 설문조사 전체기간.csv'
 
@@ -18,12 +22,11 @@ df = pd.read_csv(file_path, encoding='utf-8')
 # 데이터 확인
 st.write(df.head())
 
-# 폰트 파일 경로
+font_url = 'https://raw.githubusercontent.com/k1ngbowser/responses/main/fonts/GmarketSansTTFLight.ttf'
 font_path = 'GmarketSansTTFLight.ttf'
-font_name = plt.matplotlib.font_manager.FontProperties(fname=font_path).get_name()
-
+font_manager.fontManager.addfont(font_path)
+font_name = font_manager.FontProperties(fname=font_path).get_name()
 plt.rcParams['font.family'] = font_name
-# rc('font', family=font_name)
 
 # 객관식
 if '학년' in df.columns:
