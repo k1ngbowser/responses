@@ -28,6 +28,7 @@ import numpy as np
 import pandas as pd
 import os
 
+%%writefile app.py
 file_path = '/content/drive/MyDrive/급식 설문조사 전체기간.csv'
 
 df = pd.read_csv(file_path, encoding='utf-8')
