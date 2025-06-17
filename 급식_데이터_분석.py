@@ -15,7 +15,7 @@ import urllib.request
 import os
 import plotly.express as px
 
-file_path = '급식 설문조사 전체기간.csv'
+file_path = '급식 설문조사 전체.csv'
 df = pd.read_csv(file_path, encoding='utf-8')
 
 # 데이터 확인
