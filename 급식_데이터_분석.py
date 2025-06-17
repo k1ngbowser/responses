@@ -69,7 +69,7 @@ model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 embeddings = model.encode(split_texts)
 
 # 엘보우 기법
-sse = []
+"""sse = []
 k_range = range(2, 30)
 for k in k_range:
     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
@@ -78,10 +78,10 @@ for k in k_range:
 
 elbow_df = pd.DataFrame({'k': list(k_range), 'SSE': sse})
 fig = px.line(elbow_df, x='k', y='SSE', markers=True, title='엘보우 기법으로 최적 군집 수 찾기')
-st.plotly_chart(fig)
+st.plotly_chart(fig)"""
 
 # 군집화 실행
-n_clusters = 8
+n_clusters = 7
 kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
 labels = kmeans.fit_predict(embeddings)
 
