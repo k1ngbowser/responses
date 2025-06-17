@@ -136,7 +136,7 @@ for i in range(n_clusters):
     cluster_names[i] = cluster_keyword
 
     unique_originals = cluster_data[['원본문장']].drop_duplicates().reset_index(drop=True)
-    with st.expander(f'\n[군집 {i} - "{cluster_keyword}"] 응답 보기(총 {len(unique_originals)}건):')
+    with st.expander(f'[군집 {i} - "{cluster_keyword}"] 응답 보기 (총 {len(unique_originals)}건):'):
     for j, row in unique_originals.iterrows():
         st.write(f'- {row["원본문장"]}')
 
