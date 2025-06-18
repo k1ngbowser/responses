@@ -102,7 +102,7 @@ if '이번주 가장 좋았던 급식'and'이번주 가장 싫었던 급식' in 
         )
         st.plotly_chart(fig)
 
-df = pd.DataFrame({
+dfl = pd.DataFrame({
     '급식을 남기는 이유': [
         '맛이없다','너무 짜거나 싱겁다',
         '메뉴선택이 진짜 최악입니다. 전 영양사분땐 안 그랬는데요.. 밥 양도 조금 주시고 반찬도 일부러 적게 주시고.. 대구까스는 진짜뭡니까..아귀강정도 뭐예요… 진짜 못먹겠어요 해산물 못먹는 친구들은 어쩌라고 주 메뉴가 죄다 해산물인가요 진짜 최악입니다',
@@ -133,10 +133,10 @@ def categorize_reason(text):
     else:
         return '기타'
 
-df['카테고리'] = df['급식을 남기는 이유'].apply(categorize_reason)
+dfl['카테고리'] = dfl['급식을 남기는 이유'].apply(categorize_reason)
 
 # 카테고리별 응답 수 집계
-counts = df['카테고리'].value_counts().reset_index()
+counts = dfl['카테고리'].value_counts().reset_index()
 counts.columns = ['이유', '응답 수']
 
 # 막대그래프 시각화
@@ -151,7 +151,7 @@ fig = px.bar(
 st.plotly_chart(fig, use_container_width=True)
 
 # 기타 항목 상세 보기 (펼치기/접기)
-other_texts = df[df['카테고리'] == '기타']['급식을 남기는 이유'].tolist()
+other_texts = dfl[dfl['카테고리'] == '기타']['급식을 남기는 이유'].tolist()
 
 if other_texts:
     with st.expander("기타 항목 펼치기 / 접기"):
