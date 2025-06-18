@@ -73,7 +73,7 @@ if '이번주 가장 좋았던 급식'and'이번주 가장 싫었던 급식' in 
             labels={'급식': '급식 메뉴'}
         )
         st.plotly_chart(fig)   
-     menu_col = df['이번주 가장 싫었던 급식'].dropna().astype(str)
+    menu_col = df['이번주 가장 싫었던 급식'].dropna().astype(str)
     
     week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
     week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
