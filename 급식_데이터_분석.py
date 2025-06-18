@@ -53,7 +53,7 @@ def split_multiple_meals(text):
     if pd.isna(text):
         return []
     # 쉼표, /, 그리고, & 등을 기준으로 분리
-    parts = re.split(r',|/|&|그리고|및|그리고\s+', text)
+    parts = re.split(r',', text)
     return [p.strip() for p in parts if p.strip()]
 
 # 전체 응답 분리
