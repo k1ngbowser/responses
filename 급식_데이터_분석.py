@@ -45,74 +45,55 @@ for col in ['이번주 만족도', '잔반 비율']:
         fig = px.pie(pie_data, names=col, values='비율', title=f'{col} 비율', hole=0.4)
         st.plotly_chart(fig)
 
-# ✅ 요일별 식단 분리 함수
-def split_by_weekday(text):
-    return re.findall(r'(월요일|화요일|수요일|목요일|금요일)\s*-\s*[^월화수목금]+', text)
+if '이번주 가장 좋았던 급식'and'이번주 가장 싫었던 급식' in df.columns:
+     
+    week1_menus = [
+    "월요일 - 마라탕, 미니육전, 초코우유, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "화요일 - 순대국, 대구까스, 파인애플, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "수요일 - 치킨꿔바로우, 찹쌀약과, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "목요일- 찹스테이크, 산양요구르트, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드"
+]
+    week2_menus = [
+    "월요일 - 전주식콩나물국밥, 된장불고기, 바나나우유", "화요일 - 냉메밀국수, 알밥, 돈가스, 타코야끼, 주스", "수요일 - 육개장, 탕평채, 웅떡웅떡, 라임레몬주스, 금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)", "목요일- 카레라이스, 왕만두, 큐브카프레제, 감자스낵", "금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)"
+]
+    menu_col = df['이번주 가장 좋았던 급식'].dropna().astype(str)
+    
+    week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
+    week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
 
-# ✅ 시각화 함수
-def plot_weekly_meal(df_col, week1_menus, week2_menus, title_prefix):
-    week1 = df_col[df_col.apply(lambda x: any(menu in x for menu in week1_menus))]
-    week2 = df_col[df_col.apply(lambda x: any(menu in x for menu in week2_menus))]
-
-    week_data = {'1주차': week1, '2주차': week2}
+    week_data = {
+        '1주차': week1,
+        '2주차': week2
+    }
 
     for week_name, data in week_data.items():
-        split_data = data.apply(split_by_weekday)
-        entries = [entry.strip() for sublist in split_data for entry in sublist if entry.strip()]
-
-        # 요일과 식단 분리
-        records = []
-        for item in entries:
-            match = re.match(r'(월요일|화요일|수요일|목요일|금요일)\s*-\s*(.+)', item)
-            if match:
-                weekday, menu = match.groups()
-                records.append({'요일': weekday, '식단': menu.strip()})
-
-        if not records:
-            st.warning(f"[{week_name}] {title_prefix} 항목이 없습니다.")
-            continue
-
-        df_plot = pd.DataFrame(records)
-        df_plot = df_plot.groupby(['요일', '식단']).size().reset_index(name='응답 수')
-        df_plot['항목'] = df_plot['요일'] + ' - ' + df_plot['식단']
-
+        value_counts = data.value_counts().reset_index()
+        value_counts.columns = ['급식', '응답 수']
         fig = px.bar(
-            df_plot,
-            x='항목',
-            y='응답 수',
-            hover_data={'요일': True, '식단': True, '응답 수': True},
-            title=f"[{week_name}] {title_prefix} (복수응답 포함)",
-            labels={'항목': '급식 항목'}
+            value_counts,
+            x='급식', y='응답 수',
+            title=f'[{week_name}] 가장 좋았던 급식', 
+            labels={'급식': '급식 메뉴'}
+        )
+        st.plotly_chart(fig)   
+     menu_col = df['이번주 가장 싫었던 급식'].dropna().astype(str)
+    
+    week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
+    week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
+
+    week_data = {
+        '1주차': week1,
+        '2주차': week2
+    }
+
+    for week_name, data in week_data.items():
+        value_counts = data.value_counts().reset_index()
+        value_counts.columns = ['급식', '응답 수']
+        fig = px.bar(
+            value_counts,
+            x='급식', y='응답 수',
+            title=f'[{week_name}] 가장 싫었던 급식', 
+            labels={'급식': '급식 메뉴'}
         )
         st.plotly_chart(fig)
-
-# ✅ 메인 실행
-if '이번주 가장 싫었던 급식' in df.columns and '이번주 가장 좋았던 급식' in df.columns:
-
-    # ✅ 주차별 전체 식단 리스트
-    week1_menus = [
-        "월요일 - 마라탕, 미니육전, 초코우유, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
-        "화요일 - 순대국, 대구까스, 파인애플, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
-        "수요일 - 치킨꿔바로우, 찹쌀약과, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
-        "목요일- 찹스테이크, 산양요구르트, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
-        "금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드"
-    ]
-    week2_menus = [
-        "월요일 - 전주식콩나물국밥, 된장불고기, 바나나우유",
-        "화요일 - 냉메밀국수, 알밥, 돈가스, 타코야끼, 주스",
-        "수요일 - 육개장, 탕평채, 웅떡웅떡, 라임레몬주스, 금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)",
-        "목요일- 카레라이스, 왕만두, 큐브카프레제, 감자스낵",
-        "금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)"
-    ]
-
-    # ✅ 각각 시각화
-    st.subheader("가장 좋았던 급식")
-    best_menu_col = df['이번주 가장 좋았던 급식'].dropna().astype(str)
-    plot_weekly_meal(best_menu_col, week1_menus, week2_menus, title_prefix="가장 좋았던 급식")
-
-    st.subheader("가장 싫었던 급식")
-    worst_menu_col = df['이번주 가장 싫었던 급식'].dropna().astype(str)
-    plot_weekly_meal(worst_menu_col, week1_menus, week2_menus, title_prefix="가장 싫었던 급식")# 서술형 응답 처리
+# 서술형 응답 처리
 text_column = '추가 메뉴와 건의사항'
 
 def split_sentences(text):
@@ -134,18 +115,6 @@ for idx, text in df[text_column].dropna().astype(str).items():
 
 model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
 embeddings = model.encode(split_texts)
-
-# 엘보우 기법
-"""sse = []
-k_range = range(2, 30)
-for k in k_range:
-    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-    kmeans.fit(embeddings)
-    sse.append(kmeans.inertia_)
-
-elbow_df = pd.DataFrame({'k': list(k_range), 'SSE': sse})
-fig = px.line(elbow_df, x='k', y='SSE', markers=True, title='엘보우 기법으로 최적 군집 수 찾기')
-st.plotly_chart(fig)"""
 
 # 군집화 실행
 n_clusters = 7
