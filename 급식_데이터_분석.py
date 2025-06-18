@@ -223,38 +223,47 @@ st.plotly_chart(fig)
 
 st.write('응답 결과 분석')
 
-def show_interactive_heatmap(df, row_var, col_var, title):
+# 📌 Cramér's V 계산 함수
+def cramers_v(confusion_matrix):
+    chi2 = chi2_contingency(confusion_matrix)[0]
+    n = confusion_matrix.sum().sum()
+    k = min(confusion_matrix.shape) - 1
+    return np.sqrt(chi2 / (n * k))
+
+# 📌 상관관계 분석 및 시각화 함수
+def analyze_categorical_relationship(df, row_var, col_var, title):
     st.subheader(f"📊 {title}")
 
-    # 교차표 만들기
+    # 1. 교차표 계산
     contingency = pd.crosstab(df[row_var], df[col_var])
-
-    # Plotly 히트맵 생성
-    fig = px.imshow(
-        contingency.values,
-        x=contingency.columns,
-        y=contingency.index,
-        color_continuous_scale='YlGnBu',
-        labels=dict(x=col_var, y=row_var, color='빈도수'),
-        text_auto=True
-    )
-
-    fig.update_layout(
-        xaxis_title=col_var,
-        yaxis_title=row_var,
-        margin=dict(t=40, l=40, r=40, b=40)
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    # 카이제곱 검정
+    
+    # 2. 카이제곱 독립성 검정
     chi2, p, dof, expected = chi2_contingency(contingency)
+    v = cramers_v(contingency)
+
+    # 3. 검정 결과 출력
     st.markdown(f"**Chi² 통계량:** {chi2:.2f}")
     st.markdown(f"**p-value:** {p:.4f}")
+    st.markdown(f"**Cramér's V (관계 강도):** {v:.3f}")
     if p < 0.05:
         st.success("✔ 통계적으로 유의미한 관계입니다.")
     else:
-        st.info("ℹ 통계적으로 유의미한 관계는 아닙니다.")
+        st.info("ℹ 통계적으로 유의미한 관계는 확인되지 않았습니다.")
+
+    # 4. Stacked Bar Chart로 시각화
+    st.markdown("### ✅ 범주별 비율 시각화 (Stacked Bar Chart)")
+    proportion_df = pd.crosstab(df[row_var], df[col_var], normalize='index') * 100
+    fig = px.bar(
+        proportion_df,
+        x=proportion_df.index,
+        y=proportion_df.columns,
+        barmode='stack',
+        text_auto='.1f',
+        labels={'value': '비율 (%)', 'index': row_var, 'variable': col_var},
+        title=f"{row_var}에 따른 {col_var} 비율"
+    )
+    fig.update_layout(yaxis_title='비율 (%)', xaxis_title=row_var)
+    st.plotly_chart(fig, use_container_width=True)
 
 def show_stacked_bar(df, row_var, col_var, title):
     st.subheader(f"📊 {title}")
@@ -294,7 +303,7 @@ def show_grouped_bar(df, row_var, col_var, title):
     st.plotly_chart(fig, use_container_width=True)
 
 show_stacked_bar(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
-show_grouped_bar(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
+analyze_categorical_relationship(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
 show_stacked_bar(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
 show_stacked_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
 
