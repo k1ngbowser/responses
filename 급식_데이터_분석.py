@@ -256,8 +256,45 @@ def show_interactive_heatmap(df, row_var, col_var, title):
     else:
         st.info("ℹ 통계적으로 유의미한 관계는 아닙니다.")
 
-show_interactive_heatmap(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
-show_interactive_heatmap(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
-show_interactive_heatmap(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
-show_interactive_heatmap(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
+def show_stacked_bar(df, row_var, col_var, title):
+    st.subheader(f"📊 {title}")
+    
+    ctab = pd.crosstab(df[row_var], df[col_var], normalize='index') * 100
+    ctab = ctab.round(1)
+    ctab = ctab[sorted(ctab.columns)]  # 정렬된 열 순서
+
+    fig = px.bar(
+        ctab,
+        x=ctab.index,
+        y=ctab.columns,
+        title=title,
+        labels={'value': '비율 (%)', 'index': row_var},
+        barmode='stack',
+        text_auto='.1f'
+    )
+    fig.update_layout(xaxis_title=row_var, yaxis_title='비율 (%)')
+    st.plotly_chart(fig, use_container_width=True)
+
+def show_grouped_bar(df, row_var, col_var, title):
+    st.subheader(f"📊 {title}")
+
+    ctab = pd.crosstab(df[row_var], df[col_var])
+    ctab = ctab[sorted(ctab.columns)]  # 열 정렬
+
+    fig = px.bar(
+        ctab,
+        x=ctab.index,
+        y=ctab.columns,
+        barmode='group',
+        title=title,
+        labels={'value': '응답 수', 'index': row_var},
+        text_auto=True
+    )
+    fig.update_layout(xaxis_title=row_var, yaxis_title='응답 수')
+    st.plotly_chart(fig, use_container_width=True)
+
+show_stacked_bar(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
+show_grouped_bar(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
+show_stacked_bar(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
+show_stacked_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
 
