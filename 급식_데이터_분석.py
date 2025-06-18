@@ -7,7 +7,6 @@ import re
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sentence_transformers import SentenceTransformer
-model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2', device='cpu')
 from sklearn.cluster import KMeans
 from scipy.stats import chi2_contingency
 import numpy as np
@@ -178,7 +177,7 @@ for idx, text in df['추가 메뉴와 건의사항'].dropna().astype(str).items(
             original_indices.append(idx)
             original_sentences.append(text)
 
-model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2', device='cpu')
 embeddings = model.encode(split_texts)
 
 # 군집화 실행
