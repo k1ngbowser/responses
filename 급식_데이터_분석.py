@@ -18,8 +18,7 @@ import plotly.express as px
 file_path = '급식 설문조사 전체-1.csv'
 df = pd.read_csv(file_path, encoding='utf-8')
 
-# 데이터 확인
-st.write(df.head())
+st.write('급식 설문조사 응답 결과/결과 분석')
 
 # 폰트 설정
 font_url = 'https://raw.githubusercontent.com/k1ngbowser/responses/main/fonts/GmarketSansTTFLight.ttf'
