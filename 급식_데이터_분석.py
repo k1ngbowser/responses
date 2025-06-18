@@ -45,19 +45,28 @@ for col in ['이번주 만족도', '잔반 비율']:
         fig = px.pie(pie_data, names=col, values='비율', title=f'{col} 비율', hole=0.4)
         st.plotly_chart(fig)
 
-# 대상 열 이름
+# 대상 열
 target_column = '이번주 가장 좋았던 급식'
 
-# 해당 열에서 여러 개의 항목을 분리하여 하나의 리스트로 평탄화
-def split_multiple_meals(text):
+# 요일 기준으로 분리하는 함수
+def split_by_day(text):
     if pd.isna(text):
         return []
-    # 쉼표, /, 그리고, & 등을 기준으로 분리
-    parts = re.split(r',', text)
-    return [p.strip() for p in parts if p.strip()]
+    
+    # 요일 패턴 기준으로 앞에 구분자를 붙여서 나눔
+    parts = re.split(r'(?=(월요일|화요일|수요일|목요일|금요일))', text)
+    
+    # parts는 ['월요일', '-마라탕,육전', '화요일', '-배추김치,쌀밥'] 같이 나옴 → 다시 합쳐야 함
+    grouped = []
+    for i in range(1, len(parts), 2):
+        day = parts[i]
+        content = parts[i+1] if i+1 < len(parts) else ''
+        grouped.append(day + content.strip())
+    
+    return grouped
 
-# 전체 응답 분리
-all_meals = df[target_column].dropna().astype(str).apply(split_multiple_meals)
+# 응답 전체 분리
+all_meals = df[target_column].dropna().astype(str).apply(split_by_day)
 
 # 하나의 시리즈로 평탄화
 flat_meals = pd.Series([meal for sublist in all_meals for meal in sublist])
@@ -67,9 +76,9 @@ value_counts = flat_meals.value_counts().reset_index()
 value_counts.columns = ['급식 메뉴', '응답 수']
 
 # 시각화
-import plotly.express as px
-fig = px.bar(value_counts, x='급식 메뉴', y='응답 수', title='가장 좋았던 급식 (복수 응답 포함)')
+fig = px.bar(value_counts, x='급식 메뉴', y='응답 수', title='가장 좋았던 급식 (복수응답 포함)')
 st.plotly_chart(fig)
+
 
 if '이번주 가장 싫었던 급식' in df.columns:
     menu_col = df['이번주 가장 싫었던 급식'].dropna().astype(str)
