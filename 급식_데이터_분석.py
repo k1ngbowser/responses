@@ -223,46 +223,25 @@ st.plotly_chart(fig)
 
 st.write('응답 결과 분석')
 
-def cramers_v(confusion_matrix):
-    chi2 = chi2_contingency(confusion_matrix)[0]
-    n = confusion_matrix.sum().sum()
-    phi2 = chi2 / n
-    r, k = confusion_matrix.shape
-    return np.sqrt(phi2 / min(k - 1, r - 1))
+def plot_heatmap(df, row_var, col_var, title):
+    st.subheader(title)
+    contingency = pd.crosstab(df[row_var], df[col_var])
+    chi2, p, dof, expected = chi2_contingency(contingency)
 
-def analyze_and_plot(df, col1, col2, title):
-    # 교차표 생성
-    ct = pd.crosstab(df[col1], df[col2])
-    
-    # 카이제곱 검정
-    chi2, p, dof, expected = chi2_contingency(ct)
-    
-    # Cramér's V 계산
-    cv = cramers_v(ct)
-    
-    # 결과 출력
-    st.markdown(f"""
-**Chi² 통계량:** {chi2:.2f}  
-**p-value:** {p:.4f}  
-**Cramér's V:** {cv:.3f}
-""")
-
-    
-    if p < 0.05:
-        st.success("📌 두 변수 간에는 통계적으로 유의미한 관계가 있습니다.")
-    else:
-        st.info("ℹ️ 두 변수 간에는 유의미한 관계가 있다고 보기 어렵습니다.")
-
-    # 시각화
     fig, ax = plt.subplots(figsize=(8, 5))
-    sns.heatmap(ct, annot=True, fmt='d', cmap='YlGnBu', ax=ax)
-    ax.set_title(f"{title} (교차표 Heatmap)")
+    sns.heatmap(contingency, annot=True, fmt='d', cmap='YlOrRd', ax=ax)
+    plt.xlabel(col_var)
+    plt.ylabel(row_var)
     st.pyplot(fig)
 
-# 변수명은 사용자의 데이터프레임 컬럼명에 맞게 수정하세요.
-analyze_and_plot(df, '아침밥', '이번주 만족도', '아침식사 여부와 급식 만족도')
-analyze_and_plot(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율')
-analyze_and_plot(df, '수면시간', '이번주 만족도', '수면 시간과 만족도')
-analyze_and_plot(df, '잔반 비율', '이번주 만족도', '잔반 비율과 만족도')
-
+    st.markdown(f"**Chi² 통계량:** {chi2:.2f}")
+    st.markdown(f"**p-value:** {p:.4f}")
+    if p < 0.05:
+        st.success("✔ 유의미한 관계가 있습니다.")
+    else:
+        st.info("ℹ 통계적으로 유의미한 관계는 아닙니다.")
+plot_heatmap(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
+plot_heatmap(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
+plot_heatmap(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
+plot_heatmap(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
 
