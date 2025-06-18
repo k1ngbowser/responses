@@ -83,12 +83,11 @@ if '이번주 가장 좋았던 급식'and'이번주 가장 싫었던 급식' in 
     
     week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
     week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
-    week3 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week3_menus))]
+   
 
     week_data = {
         '1주차': week1,
-        '2주차': week2,
-        '3주차': week3
+        '2주차': week2
     }
 
     for week_name, data in week_data.items():
