@@ -7,6 +7,7 @@ import re
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2', device='cpu')
 from sklearn.cluster import KMeans
 from scipy.stats import chi2_contingency
 import numpy as np
