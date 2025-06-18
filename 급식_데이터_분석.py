@@ -223,25 +223,41 @@ st.plotly_chart(fig)
 
 st.write('응답 결과 분석')
 
-def plot_heatmap(df, row_var, col_var, title):
-    st.subheader(title)
+def show_interactive_heatmap(df, row_var, col_var, title):
+    st.subheader(f"📊 {title}")
+
+    # 교차표 만들기
     contingency = pd.crosstab(df[row_var], df[col_var])
+
+    # Plotly 히트맵 생성
+    fig = px.imshow(
+        contingency.values,
+        x=contingency.columns,
+        y=contingency.index,
+        color_continuous_scale='YlGnBu',
+        labels=dict(x=col_var, y=row_var, color='빈도수'),
+        text_auto=True
+    )
+
+    fig.update_layout(
+        xaxis_title=col_var,
+        yaxis_title=row_var,
+        margin=dict(t=40, l=40, r=40, b=40)
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # 카이제곱 검정
     chi2, p, dof, expected = chi2_contingency(contingency)
-
-    fig, ax = plt.subplots(figsize=(8, 5))
-    sns.heatmap(contingency, annot=True, fmt='d', cmap='YlOrRd', ax=ax)
-    plt.xlabel(col_var)
-    plt.ylabel(row_var)
-    st.pyplot(fig)
-
     st.markdown(f"**Chi² 통계량:** {chi2:.2f}")
     st.markdown(f"**p-value:** {p:.4f}")
     if p < 0.05:
-        st.success("✔ 유의미한 관계가 있습니다.")
+        st.success("✔ 통계적으로 유의미한 관계입니다.")
     else:
         st.info("ℹ 통계적으로 유의미한 관계는 아닙니다.")
-plot_heatmap(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
-plot_heatmap(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
-plot_heatmap(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
-plot_heatmap(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
+
+show_interactive_heatmap(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
+show_interactive_heatmap(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
+show_interactive_heatmap(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
+show_interactive_heatmap(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
 
