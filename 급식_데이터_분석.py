@@ -45,39 +45,61 @@ for col in ['이번주 만족도', '잔반 비율']:
         fig = px.pie(pie_data, names=col, values='비율', title=f'{col} 비율', hole=0.4)
         st.plotly_chart(fig)
 
-# 대상 열
-target_column = '이번주 가장 좋았던 급식'
+import re
+import pandas as pd
+import plotly.express as px
+import streamlit as st
 
-# 요일 기준으로 분리하는 함수
-def split_by_day(text):
-    if pd.isna(text):
-        return []
-    
-    # 요일 패턴 기준으로 앞에 구분자를 붙여서 나눔
-    parts = re.split(r'(?=(월요일|화요일|수요일|목요일|금요일))', text)
-    
-    # parts는 ['월요일', '-마라탕,육전', '화요일', '-배추김치,쌀밥'] 같이 나옴 → 다시 합쳐야 함
-    grouped = []
-    for i in range(1, len(parts), 2):
-        day = parts[i]
-        content = parts[i+1] if i+1 < len(parts) else ''
-        grouped.append(day + content.strip())
-    
-    return grouped
+# CSV 파일 불러오기
+df = pd.read_csv('급식 설문조사 전체.csv')
 
-# 응답 전체 분리
-all_meals = df[target_column].dropna().astype(str).apply(split_by_day)
+if '이번주 가장 싫었던 급식' in df.columns:  # 임시 조건, 실제로는 '가장 좋았던 급식'이 핵심
+    menu_col = df['이번주 가장 좋았던 급식'].dropna().astype(str)
 
-# 하나의 시리즈로 평탄화
-flat_meals = pd.Series([meal for sublist in all_meals for meal in sublist])
+    # 기준 주차 응답 텍스트 (원문 포함)
+    week1_menus = [
+        "월요일 - 마라탕, 미니육전, 초코우유, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
+        "화요일 - 순대국, 대구까스, 파인애플, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
+        "수요일 - 치킨꿔바로우, 찹쌀약과, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
+        "목요일- 찹스테이크, 산양요구르트, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
+        "금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드"
+    ]
+    week2_menus = [
+        "월요일 - 전주식콩나물국밥, 된장불고기, 바나나우유",
+        "화요일 - 냉메밀국수, 알밥, 돈가스, 타코야끼, 주스",
+        "수요일 - 육개장, 탕평채, 웅떡웅떡, 라임레몬주스, 금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)",
+        "목요일- 카레라이스, 왕만두, 큐브카프레제, 감자스낵",
+        "금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)"
+    ]
 
-# 응답 수 세기
-value_counts = flat_meals.value_counts().reset_index()
-value_counts.columns = ['급식 메뉴', '응답 수']
+    # 주차별 응답 필터링
+    week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
+    week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
 
-# 시각화
-fig = px.bar(value_counts, x='급식 메뉴', y='응답 수', title='가장 좋았던 급식 (복수응답 포함)')
-st.plotly_chart(fig)
+    week_data = {'1주차': week1, '2주차': week2}
+
+    # 요일별 급식 항목 분리 함수
+    def split_by_weekday(text):
+        if pd.isna(text): return []
+        return re.findall(r'(월요일|화요일|수요일|목요일|금요일)\s*-\s*[^월화수목금]+', text)
+
+    # 주차별 그래프 출력
+    for week_name, data in week_data.items():
+        split_data = data.apply(split_by_weekday)
+        flat = pd.Series([entry.strip() for sublist in split_data for entry in sublist])
+        flat = flat[flat != '']  # 공백 제거
+
+        value_counts = flat.value_counts().reset_index()
+        value_counts.columns = ['요일-급식 항목', '응답 수']
+
+        fig = px.bar(
+            value_counts,
+            x='요일-급식 항목', y='응답 수',
+            title=f"[{week_name}] 가장 좋았던 급식 (요일 기준 분리)",
+            labels={'요일-급식 항목': '급식 항목'}
+        )
+        st.plotly_chart(fig)
+
 
 
 if '이번주 가장 싫었던 급식' in df.columns:
