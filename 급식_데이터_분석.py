@@ -250,7 +250,7 @@ def analyze_categorical_relationship(df, row_var, col_var, title):
         st.info("ℹ 통계적으로 유의미한 관계는 확인되지 않았습니다.")
 
     # 4. Stacked Bar Chart로 시각화
-    st.markdown("### ✅ 범주별 비율 시각화 (Stacked Bar Chart)")
+    st.markdown("### ✅ 응답별 비율 시각화 (Stacked Bar Chart)")
     proportion_df = pd.crosstab(df[row_var], df[col_var], normalize='index') * 100
     fig = px.bar(
         proportion_df,
@@ -301,11 +301,11 @@ def show_grouped_bar(df, row_var, col_var, title):
     fig.update_layout(xaxis_title=row_var, yaxis_title='응답 수')
     st.plotly_chart(fig, use_container_width=True)
 
-show_stacked_bar(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
+"show_stacked_bar(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
 analyze_categorical_relationship(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
-show_grouped_bar(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
+"show_grouped_bar(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
 analyze_categorical_relationship(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
-show_stacked_bar(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
+"show_stacked_bar(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
 analyze_categorical_relationship(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
-show_stacked_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
+"show_stacked_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
 analyze_categorical_relationship(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
