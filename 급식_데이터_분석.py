@@ -240,10 +240,12 @@ def analyze_and_plot(df, col1, col2, title):
     cv = cramers_v(ct)
     
     # 결과 출력
-    st.subheader(f"📊 {col1} vs {col2}")
-    st.markdown(f"**Chi² 통계량:** {chi2:.2f}  
-    **p-value:** {p:.4f}  
-    **Cramér's V:** {cv:.3f}")
+    st.markdown(f"""
+**Chi² 통계량:** {chi2:.2f}  
+**p-value:** {p:.4f}  
+**Cramér's V:** {cv:.3f}
+""")
+
     
     if p < 0.05:
         st.success("📌 두 변수 간에는 통계적으로 유의미한 관계가 있습니다.")
