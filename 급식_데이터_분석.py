@@ -169,7 +169,7 @@ split_texts = []
 original_indices = []
 original_sentences = []
 
-for col in df['추가 메뉴와 건의사항'].dropna().astype(str).items():
+for idx, text in df['추가 메뉴와 건의사항'].dropna().astype(str).items():
     splits = split_sentences(text)
     for part in splits:
         cleaned = part.strip()
