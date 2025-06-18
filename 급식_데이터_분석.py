@@ -45,33 +45,31 @@ for col in ['이번주 만족도', '잔반 비율']:
         fig = px.pie(pie_data, names=col, values='비율', title=f'{col} 비율', hole=0.4)
         st.plotly_chart(fig)
 
-if '이번주 가장 좋았던 급식' in df.columns:
-    menu_col = df['이번주 가장 좋았던 급식'].dropna().astype(str)
-    week1_menus = [
-    "월요일 - 마라탕, 미니육전, 초코우유, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "화요일 - 순대국, 대구까스, 파인애플, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "수요일 - 치킨꿔바로우, 찹쌀약과, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "목요일- 찹스테이크, 산양요구르트, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드"
-]
-    week2_menus = [
-    "월요일 - 전주식콩나물국밥, 된장불고기, 바나나우유", "화요일 - 냉메밀국수, 알밥, 돈가스, 타코야끼, 주스", "수요일 - 육개장, 탕평채, 웅떡웅떡, 라임레몬주스, 금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)", "목요일- 카레라이스, 왕만두, 큐브카프레제, 감자스낵", "금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)"
-]
-    
-    week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
-    week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
+# 대상 열 이름
+target_column = '이번주 가장 좋았던 급식'
 
-    week_data = {
-        '1주차': week1,
-        '2주차': week2
-    }
+# 해당 열에서 여러 개의 항목을 분리하여 하나의 리스트로 평탄화
+def split_multiple_meals(text):
+    if pd.isna(text):
+        return []
+    # 쉼표, /, 그리고, & 등을 기준으로 분리
+    parts = re.split(r',|/|&|그리고|및|그리고\s+', text)
+    return [p.strip() for p in parts if p.strip()]
 
-    for week_name, data in week_data.items():
-        value_counts = data.value_counts().reset_index()
-        value_counts.columns = ['급식', '응답 수']
-        fig = px.bar(
-            value_counts,
-            x='급식', y='응답 수',
-            title=f'[{week_name}] 가장 좋았던 급식',
-            labels={'급식': '급식 메뉴'}
-        )
-        st.plotly_chart(fig)
+# 전체 응답 분리
+all_meals = df[target_column].dropna().astype(str).apply(split_multiple_meals)
+
+# 하나의 시리즈로 평탄화
+flat_meals = pd.Series([meal for sublist in all_meals for meal in sublist])
+
+# 응답 수 세기
+value_counts = flat_meals.value_counts().reset_index()
+value_counts.columns = ['급식 메뉴', '응답 수']
+
+# 시각화
+import plotly.express as px
+fig = px.bar(value_counts, x='급식 메뉴', y='응답 수', title='가장 좋았던 급식 (복수 응답 포함)')
+st.plotly_chart(fig)
 
 if '이번주 가장 싫었던 급식' in df.columns:
     menu_col = df['이번주 가장 싫었던 급식'].dropna().astype(str)
