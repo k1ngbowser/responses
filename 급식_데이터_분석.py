@@ -193,7 +193,7 @@ result_df = pd.DataFrame({
     '원본문장': original_sentences
 })
 
-st.write(f'\n=== [{text_column}] 군집화 결과 (군집 이름 포함) ===')
+st.write(f'\n=== [{'추가 메뉴와 건의사항'}] 군집화 결과 (군집 이름 포함) ===')
 cluster_names = {}
 for i in range(n_clusters):
     cluster_data = result_df[result_df['군집'] == i]
