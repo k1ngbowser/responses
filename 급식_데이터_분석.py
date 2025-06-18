@@ -45,7 +45,7 @@ for col in ['이번주 만족도', '잔반 비율']:
         fig = px.pie(pie_data, names=col, values='비율', title=f'{col} 비율', hole=0.4)
         st.plotly_chart(fig)
 
-if '이번주 가장 싫었던 급식'&'이번주 가장 좋았던 급식' in df.columns:
+if '이번주 가장 싫었던 급식'and'이번주 가장 좋았던 급식' in df.columns:
    
     week1_menus = [
         "월요일 - 마라탕, 미니육전, 초코우유, 금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드",
