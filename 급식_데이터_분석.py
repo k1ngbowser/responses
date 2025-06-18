@@ -137,8 +137,8 @@ for i in range(n_clusters):
 
     unique_originals = cluster_data[['원본문장']].drop_duplicates().reset_index(drop=True)
     with st.expander(f'[군집 {i} - "{cluster_keyword}"] 응답 보기 (총 {len(unique_originals)}건):'):
-    for j, row in unique_originals.iterrows():
-        st.write(f'- {row["원본문장"]}')
+        for j, row in unique_originals.iterrows():
+            st.write(f'- {row["원본문장"]}')
 
 # 군집별 문장 수 시각화
 result_df['군집명'] = result_df['군집'].map(cluster_names)
