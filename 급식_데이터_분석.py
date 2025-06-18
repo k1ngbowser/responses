@@ -15,7 +15,7 @@ import urllib.request
 import os
 import plotly.express as px
 
-file_path = '급식 설문조사 전체.csv'
+file_path = '급식 설문조사 전체-1.csv'
 df = pd.read_csv(file_path, encoding='utf-8')
 
 # 데이터 확인
@@ -53,14 +53,19 @@ if '이번주 가장 좋았던 급식'and'이번주 가장 싫었던 급식' in 
     week2_menus = [
     "월요일 - 전주식콩나물국밥, 된장불고기, 바나나우유", "화요일 - 냉메밀국수, 알밥, 돈가스, 타코야끼, 주스", "수요일 - 육개장, 탕평채, 웅떡웅떡, 라임레몬주스","금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)", "목요일- 카레라이스, 왕만두, 큐브카프레제, 감자스낵"
 ]
+    week3_menus = [
+    "월요일 - 새우베이컨볶음밥, 감자샐러드, 모닝빵, 자몽에이드", "화요일 - 대패삼겹버섯구이, 요구르트", "수요일 - 잔치국수, 오리주물럭, 파인애플","목요일- 갈비탕, 오징어김치전, 복숭아주스", "금요일 - 닭갈비, 이상한나라의솜사탕아이스크림"
+]
     menu_col = df['이번주 가장 좋았던 급식'].dropna().astype(str)
     
     week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
     week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
+    week3 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week3_menus))]
 
     week_data = {
         '1주차': week1,
-        '2주차': week2
+        '2주차': week2,
+        '3주차': week3
     }
 
     for week_name, data in week_data.items():
@@ -73,14 +78,17 @@ if '이번주 가장 좋았던 급식'and'이번주 가장 싫었던 급식' in 
             labels={'급식': '급식 메뉴'}
         )
         st.plotly_chart(fig)   
+        
     menu_col = df['이번주 가장 싫었던 급식'].dropna().astype(str)
     
     week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
     week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
+    week3 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week3_menus))]
 
     week_data = {
         '1주차': week1,
-        '2주차': week2
+        '2주차': week2,
+        '3주차': week3
     }
 
     for week_name, data in week_data.items():
