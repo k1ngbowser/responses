@@ -232,8 +232,7 @@ def cramers_v(confusion_matrix):
 
 # 📌 상관관계 분석 및 시각화 함수
 def analyze_categorical_relationship(df, row_var, col_var, title):
-    st.subheader(f"📊 {title}")
-
+   
     # 1. 교차표 계산
     contingency = pd.crosstab(df[row_var], df[col_var])
     
@@ -303,8 +302,10 @@ def show_grouped_bar(df, row_var, col_var, title):
     st.plotly_chart(fig, use_container_width=True)
 
 show_stacked_bar(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
+analyze_categorical_relationship(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
 show_grouped_bar(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
 analyze_categorical_relationship(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
 show_stacked_bar(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
+analyze_categorical_relationship(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
 show_stacked_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
-
+analyze_categorical_relationship(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
