@@ -139,20 +139,25 @@ df['카테고리'] = df['급식을 남기는 이유'].apply(categorize_reason)
 counts = df['카테고리'].value_counts().reset_index()
 counts.columns = ['이유', '응답 수']
 
-# 막대그래프 그리기
-fig = px.bar(counts, x='이유', y='응답 수', title='급식을 남기는 이유')
+# 막대그래프 시각화
+fig = px.bar(
+    counts,
+    x='이유',
+    y='응답 수',
+    title='급식을 남기는 이유',
+    labels={'이유': '이유', '응답 수': '응답 수'}
+)
 
 st.plotly_chart(fig, use_container_width=True)
 
-# '기타' 상세 보기 버튼
-if st.button('기타 항목 상세 보기'):
-    other_texts = df[df['카테고리'] == '기타']['급식을 남기는 이유'].tolist()
-    if other_texts:
-        st.write("### 기타에 포함된 상세 항목:")
+# 기타 항목 상세 보기 (펼치기/접기)
+other_texts = df[df['카테고리'] == '기타']['급식을 남기는 이유'].tolist()
+
+if other_texts:
+    with st.expander("기타 항목 펼치기 / 접기"):
+        st.markdown("**기타에 포함된 응답:**")
         for i, txt in enumerate(other_texts, 1):
             st.write(f"{i}. {txt}")
-    else:
-        st.write("기타 항목이 없습니다.")
 
 
 # 서술형 응답 처리
