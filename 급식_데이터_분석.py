@@ -161,8 +161,6 @@ if other_texts:
 
 
 # 서술형 응답 처리
-text_column = '추가 메뉴와 건의사항'
-
 def split_sentences(text):
     text = re.sub(r'[.?!]', '', text)
     return re.split(r',|그리고|또는|및|&|/|또\s+|그리고\s+', text)
@@ -171,7 +169,7 @@ split_texts = []
 original_indices = []
 original_sentences = []
 
-for idx, text in df[text_column].dropna().astype(str).items():
+for col in df['추가 메뉴와 건의사항'].dropna().astype(str).items():
     splits = split_sentences(text)
     for part in splits:
         cleaned = part.strip()
@@ -223,21 +221,4 @@ bar_df.columns = ['군집 키워드', '문장 수']
 fig = px.bar(bar_df, x='군집 키워드', y='문장 수', title='서술형 응답 군집별 문장 수')
 st.plotly_chart(fig)
 
-# PCA 시각화
-pca = PCA(n_components=2)
-reduced = pca.fit_transform(embeddings)
-
-reduced_df = pd.DataFrame({
-    'x': reduced[:, 0],
-    'y': reduced[:, 1],
-    '군집': result_df['군집'],
-    '군집명': result_df['군집명'],
-    '문장_분절': result_df['문장_분절']
-})
-fig = px.scatter(
-    reduced_df, x='x', y='y', color='군집명',
-    title='서술형 응답 2D 군집 시각화 (PCA)',
-    hover_data=['문장_분절']
-)
-st.plotly_chart(fig)
 
