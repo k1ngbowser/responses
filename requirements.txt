@@ -8,4 +8,3 @@ plotly.express
 torch
 sentence-transformers
 fugashi
-python-mecab-ko
