@@ -119,12 +119,12 @@ def plot_weekday_meals(df, column_name, week_num, menus, title):
 
 # ---------------------- Streamlit 실행 영역 ----------------------
 st.title("급식 만족도-이번주 가장 좋았던 급식(2개 선택), 이번주 가장 싫었던 급식(1개 선택)")
-    plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=1, menus=week1_menus, title='(1주차)이번주 가장 좋았던 급식')
-    plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=2, menus=week2_menus, title='(2주차)이번주 가장 좋았던 급식')
-    plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=3, menus=week3_menus, title='(3주차)이번주 가장 좋았던 급식')
+plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=1, menus=week1_menus, title='(1주차)이번주 가장 좋았던 급식')
+plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=2, menus=week2_menus, title='(2주차)이번주 가장 좋았던 급식')
+plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=3, menus=week3_menus, title='(3주차)이번주 가장 좋았던 급식')
 
-    plot_weekday_meals(df, '이번주 가장 싫었던 급식', week_num=1, menus=week1_menus, title='(1주차)이번주 가장 싫었던 급식')
-    plot_weekday_meals(df, '이번주 가장 싫었던 급식', week_num=2, menus=week2_menus, title='(2주차)이번주 가장 싫었던 급식')
+plot_weekday_meals(df, '이번주 가장 싫었던 급식', week_num=1, menus=week1_menus, title='(1주차)이번주 가장 싫었던 급식')
+plot_weekday_meals(df, '이번주 가장 싫었던 급식', week_num=2, menus=week2_menus, title='(2주차)이번주 가장 싫었던 급식')
  
 dfl = pd.DataFrame({
     '급식을 남기는 이유': [
