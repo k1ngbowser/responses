@@ -173,7 +173,7 @@ def split_sentences(text):
     return re.split(r',| |', text)
 
 def cluster_text_responses(df, text_column, n_clusters=9, top_n=5):
-    st.subheader("건의사항 응답 군집 분석")
+    st.subheader("추가 메뉴와 기타 건의사항항")
 
     # 문장 분리
     sentences = []
@@ -205,7 +205,7 @@ def cluster_text_responses(df, text_column, n_clusters=9, top_n=5):
     cluster_keywords = {}
     for cluster, sents in cluster_sentences.items():
         vectorizer = TfidfVectorizer(stop_words='english', max_features=5)
-        X = vectorizer.fit_transform(sents)
+        X = vectorizer.fit_transform(sentences)
         keywords = vectorizer.get_feature_names_out()
         cluster_keywords[cluster] = keywords.tolist() if len(keywords) > 0 else ["기타"]
 
