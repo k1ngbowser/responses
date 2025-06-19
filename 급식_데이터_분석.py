@@ -236,7 +236,7 @@ def cluster_text_responses(df, text_column, n_clusters=10, top_n=5):
     # 모든 군집 세부 내용 보기
     st.markdown("### 📋 모든 군집별 원문 응답 보기")
     for cluster in sorted(cluster_sentences.keys()):
-        with st.expander(f"Cluster {cluster} – 키워드: {', '.join(cluster_keywords[cluster])}"):
+        with st.expander(f"Cluster {cluster} – 키워드: {' '.join(cluster_keywords[cluster])}"):
             for s in cluster_sentences[cluster]:
                 st.markdown(f"- {s}")
 
