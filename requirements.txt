@@ -7,7 +7,6 @@ sentence-transformers
 plotly.express
 torch
 sentence-transformers
-konlpy
-jpype1
+konlp
 fugashi
 python-mecab-ko
