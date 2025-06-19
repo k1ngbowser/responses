@@ -108,15 +108,6 @@ if '이번주 가장 좋았던 급식'and'이번주 가장 싫었던 급식' in 
             labels={'급식': '급식 메뉴'}
         )
         st.plotly_chart(fig)
-# ---------------------- Streamlit 실행 영역 ----------------------
-st.title("급식 만족도")
-
-plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=1, menus=week1_menus, title='이번주 가장 좋았던 급식')
-plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=2, menus=week2_menus, title='(2주차)이번주 가장 좋았던 급식')
-plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=3, menus=week3_menus, title='(3주차)이번주 가장 좋았던 급식')
-
-plot_weekday_meals(df, '이번주 가장 싫었던 급식', week_num=1, menus=week1_menus, title='(1주차)이번주 가장 싫었던 급식')
-plot_weekday_meals(df, '이번주 가장 싫었던 급식', week_num=2, menus=week2_menus, title='(2주차)이번주 가장 싫었던 급식')
 
  
 dfl = pd.DataFrame({
