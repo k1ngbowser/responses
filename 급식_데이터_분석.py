@@ -81,7 +81,7 @@ week3_menus = [
 def extract_weekday_and_menu(text):
     match = re.match(r'(월요일|화요일|수요일|목요일|금요일)\s*-\s*(.+)', text.strip())
     if match:
-        return match.group(1), match.group(2), match.group(3)
+        return match.group(1), match.group(2)
     return '기타', text.strip()
 
 def filter_by_week(menus, target_column):
