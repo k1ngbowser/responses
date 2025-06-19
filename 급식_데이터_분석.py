@@ -81,7 +81,7 @@ week3_menus = [
 def extract_weekday_and_menu(text):
     match = re.match(r'(월요일|화요일|수요일|목요일|금요일)\s*-\s*(.+)', text.strip())
     if match:
-        return match.group(1), match.group(2)
+        return match.group(1), match.group(2), match.group(3)
     return '기타', text.strip()
 
 def filter_by_week(menus, target_column):
@@ -91,7 +91,6 @@ def plot_weekday_meals(df, column_name, week_num, menus, title):
     menu_col = df[column_name].dropna().astype(str)
     week_filtered = filter_by_week(menus, menu_col)
 
-    # 요일-식단 추출
     weekday_menu_list = week_filtered.apply(extract_weekday_and_menu)
     weekdays = [w for w, _ in weekday_menu_list]
     meals = [m for _, m in weekday_menu_list]
@@ -101,46 +100,33 @@ def plot_weekday_meals(df, column_name, week_num, menus, title):
         '식단': meals
     })
 
-    # 요일 순서 고정
     weekday_order = ['월요일', '화요일', '수요일', '목요일', '금요일']
     df_plot['요일'] = pd.Categorical(df_plot['요일'], categories=weekday_order, ordered=True)
 
-    # 요일별 식단 그룹별 응답 수 집계
-    count_df = df_plot.groupby(['요일', '식단'], as_index=False).size()
+    count_df = df_plot.groupby(['요일', '식단']).size().reset_index(name='응답 수')
 
-    # 🧩 누락된 요일 채우기 위한 보완 로직
-    if not count_df.empty:
-        # 누락 요일-식단 조합 보완
-        existing_pairs = set(zip(count_df['요일'], count_df['식단']))
-        full_pairs = set((day, meal) for day in weekday_order for meal in df_plot['식단'].unique())
-
-        missing_pairs = full_pairs - existing_pairs
-        if missing_pairs:
-            fill_rows = pd.DataFrame(missing_pairs, columns=['요일', '식단'])
-            fill_rows['size'] = 0
-            count_df = pd.concat([count_df, fill_rows], ignore_index=True)
-
-    # 시각화
     fig = px.bar(
         count_df,
         x='요일',
-        y='size',
+        y='응답 수',
         color='식단',
-        hover_data={'식단': True, 'size': True, '요일': False},
+        hover_data={'식단': True, '응답 수': True, '요일': False},
         title=f"[{week_num}주차] {title}",
-        labels={'요일': '요일', 'size': '응답 수'}
+        labels={'요일': '요일', '응답 수': '응답 수'}
     )
     fig.update_layout(xaxis_title='요일', yaxis_title='응답 수', showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
 # ---------------------- Streamlit 실행 영역 ----------------------
-st.title("급식 만족도-이번주 가장 좋았던 급식(2개 선택), 이번주 가장 싫었던 급식(1개 선택)")
-plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=1, menus=week1_menus, title='(1주차)이번주 가장 좋았던 급식')
+st.title("급식 만족도")
+
+plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=1, menus=week1_menus, title='이번주 가장 좋았던 급식')
 plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=2, menus=week2_menus, title='(2주차)이번주 가장 좋았던 급식')
 plot_weekday_meals(df, '이번주 가장 좋았던 급식', week_num=3, menus=week3_menus, title='(3주차)이번주 가장 좋았던 급식')
 
 plot_weekday_meals(df, '이번주 가장 싫었던 급식', week_num=1, menus=week1_menus, title='(1주차)이번주 가장 싫었던 급식')
 plot_weekday_meals(df, '이번주 가장 싫었던 급식', week_num=2, menus=week2_menus, title='(2주차)이번주 가장 싫었던 급식')
+
  
 dfl = pd.DataFrame({
     '급식을 남기는 이유': [
