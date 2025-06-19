@@ -78,6 +78,15 @@ week3_menus = [
     "금요일 - 닭갈비, 이상한나라의솜사탕아이스크림"
 ]
 
+def extract_weekday_and_menu(text):
+    match = re.match(r'(월요일|화요일|수요일|목요일|금요일)\s*-\s*(.+)', text.strip())
+    if match:
+        return match.group(1), match.group(2)
+    return '기타', text.strip()
+
+def filter_by_week(menus, target_column):
+    return target_column[target_column.apply(lambda x: any(menu in x for menu in menus))]
+
 def plot_weekday_meals(df, column_name, week_num, menus, title):
     menu_col = df[column_name].dropna().astype(str)
     week_filtered = filter_by_week(menus, menu_col)
