@@ -216,7 +216,7 @@ def cluster_text_responses(df, text_column, n_clusters=10, top_n=5):
 
     df_plot = pd.DataFrame({
         '군집': [f'Cluster {i}' for i in top_clusters],
-        '대표 키워드': [", ".join(cluster_keywords[i]) for i in top_clusters],
+        '대표 키워드': [" ".join(cluster_keywords[i]) for i in top_clusters],
         '응답 수': [counts[i] for i in top_clusters]
     })
 
