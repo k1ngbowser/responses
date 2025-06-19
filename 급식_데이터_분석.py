@@ -205,10 +205,10 @@ def cluster_text_responses(df, text_column, n_clusters=10, top_n=5):
     # TF-IDF 키워드 추출
     cluster_keywords = {}
     for cluster, sents in cluster_sentences.items():
-        vectorizer = TfidfVectorizer(stop_words='english', max_features=5)
+        vectorizer = TfidfVectorizer(stop_words='english', max_features=1)
         X = vectorizer.fit_transform(sents)
         keywords = vectorizer.get_feature_names_out()
-        cluster_keywords[cluster] = keywords.tolist() if len(keywords) > 0 else ["기타"]
+        cluster_keywords[cluster] = keywords[0] if len(keywords) > 0 else "기타"]
 
     # 군집별 응답 수
     counts = pd.Series(labels).value_counts().sort_values(ascending=False)
@@ -223,7 +223,7 @@ def cluster_text_responses(df, text_column, n_clusters=10, top_n=5):
     # 시각화
     fig = px.bar(
         df_plot,
-        x='군집',
+        x='대표 키워드',
         y='응답 수',
         text='응답 수',
         hover_data={'대표 키워드': True},
