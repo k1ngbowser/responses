@@ -8,3 +8,6 @@ plotly.express
 torch
 sentence-transformers
 konlpy
+jpype1
+fugashi
+python-mecab-ko
