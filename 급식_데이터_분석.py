@@ -319,6 +319,6 @@ def show_grouped_bar(df, row_var, col_var, title):
         st.info("ℹ 통계적으로 유의미한 관계는 확인되지 않았습니다.")
 
 analyze_categorical_relationship(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
-show_facet_bar(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
+show_facet_bar(df, '잔반 비율', '수면시간', '수면시간과 잔반 비율 관계')
 analyze_categorical_relationship(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
 show_grouped_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
