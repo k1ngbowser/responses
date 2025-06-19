@@ -7,4 +7,3 @@ sentence-transformers
 plotly.express
 torch
 sentence-transformers
-fugashi
