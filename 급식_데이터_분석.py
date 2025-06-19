@@ -208,7 +208,7 @@ def cluster_text_responses(df, text_column, n_clusters=10, top_n=5):
         vectorizer = TfidfVectorizer(stop_words='english', max_features=1)
         X = vectorizer.fit_transform(sents)
         keywords = vectorizer.get_feature_names_out()
-        cluster_keywords[cluster] = keywords[0] if len(keywords) > 0 else "기타"]
+        cluster_keywords[cluster] = keywords[0] if len(keywords) > 0 else "기타"
 
     # 군집별 응답 수
     counts = pd.Series(labels).value_counts().sort_values(ascending=False)
