@@ -169,82 +169,67 @@ if other_texts:
             st.write(f"{i}. {txt}")
 
 
+# 서술형 응답 처리
 def split_sentences(text):
     text = re.sub(r'[.?!]', '', text)
-    return re.split(r',| |', text)
+    return re.split(r',', text)
 
-def cluster_text_responses(df, text_column, n_clusters=9, top_n=5):
-    st.subheader("추가 메뉴와 기타 건의사항")
+split_texts = []
+original_indices = []
+original_sentences = []
 
-    # 문장 분리
-    sentences = []
-    for response in df[text_column].dropna().astype(str):
-        for s in split_sentences(response):
-            s_clean = s.strip()
-            if s_clean:
-                sentences.append(s_clean)
+for idx, text in df['추가 메뉴와 건의사항'].dropna().astype(str).items():
+    splits = split_sentences(text)
+    for part in splits:
+        cleaned = part.strip()
+        if cleaned:
+            split_texts.append(cleaned)
+            original_indices.append(idx)
+            original_sentences.append(text)
 
-    if not sentences:
-        st.warning("유효한 문장이 없습니다.")
-        return
+model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+model = model.to('cpu')
+embeddings = model.encode(split_texts)
 
-    # 문장 임베딩
-    with st.spinner("문장 임베딩 중..."):
-        model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-        embeddings = model.encode(sentences)
+# 군집화 실행
+n_clusters = 9
+kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+labels = kmeans.fit_predict(embeddings)
 
-    # 군집화
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    labels = kmeans.fit_predict(embeddings)
+result_df = pd.DataFrame({
+    '문장_분절': split_texts,
+    '군집': labels,
+    '원본문장_index': original_indices,
+    '원본문장': original_sentences
+})
 
-    # 군집별 문장 모음
-    cluster_sentences = {i: [] for i in range(n_clusters)}
-    for label, sentence in zip(labels, sentences):
-        cluster_sentences[label].append(sentence)
+st.write(f'\n=== [{'추가 메뉴와 건의사항'}] 군집화 결과 (군집 이름 포함) ===')
+cluster_names = {}
+for i in range(n_clusters):
+    cluster_data = result_df[result_df['군집'] == i]
+    cluster_sentences = cluster_data['문장_분절'].tolist()
 
-    # TF-IDF 키워드 추출
-    cluster_keywords = {}
-    for cluster, sents in cluster_sentences.items():
-        vectorizer = TfidfVectorizer(stop_words='english', max_features=5)
-        X = vectorizer.fit_transform(sentences)
-        keywords = vectorizer.get_feature_names_out()
-        cluster_keywords[cluster] = keywords.tolist() if len(keywords) > 0 else ["기타"]
+    vectorizer = TfidfVectorizer(max_features=20, stop_words='english')
+    tfidf_matrix = vectorizer.fit_transform(cluster_sentences)
+    feature_names = vectorizer.get_feature_names_out()
+    scores = tfidf_matrix.sum(axis=0).A1
+    top_idx = scores.argmax()
+    cluster_keyword = feature_names[top_idx]
 
-    # 군집별 응답 수
-    counts = pd.Series(labels).value_counts().sort_values(ascending=False)
-    top_clusters = counts.head(top_n).index
+    cluster_names[i] = cluster_keyword
 
-    df_plot = pd.DataFrame({
-        '군집': [f'Cluster {i}' for i in top_clusters],
-        '대표 키워드': ["".join(cluster_keywords[i]) for i in top_clusters],
-        '응답 수': [counts[i] for i in top_clusters]
-    })
+    unique_originals = cluster_data[['원본문장']].drop_duplicates().reset_index(drop=True)
+    with st.expander(f'[군집 {i} - "{cluster_keyword}"] 응답 보기 (총 {len(unique_originals)}건):'):
+        for j, row in unique_originals.iterrows():
+            st.write(f'- {row["원본문장"]}')
 
-    # 시각화
-    fig = px.bar(
-        df_plot,
-        x='군집',
-        y='응답 수',
-        text='응답 수',
-        hover_data={'대표 키워드': True},
-        title=f'건의사항 응답 상위 {top_n}개 군집',
-    )
-    fig.update_traces(textposition='outside')
-    fig.update_layout(yaxis_title="응답 수", xaxis_title="군집", hovermode="x unified")
-    st.plotly_chart(fig, use_container_width=True)
-
-    # 모든 군집 세부 내용 보기
-    st.markdown("### 📋 모든 군집별 원문 응답 보기")
-    for cluster in sorted(cluster_sentences.keys()):
-        with st.expander(f"Cluster {cluster} – 키워드: {''.join(cluster_keywords[cluster])}"):
-            for s in cluster_sentences[cluster]:
-                st.markdown(f"- {s}")
-
-# ------------------ 3. 실행 ------------------
-if '추가 메뉴와 건의사항' in df.columns:
-    cluster_text_responses(df, '추가 메뉴와 건의사항')
-else:
-    st.warning("데이터프레임에 '추가 메뉴와 건의사항' 컬럼이 없습니다.")
+# 군집별 문장 수 시각화
+result_df['군집명'] = result_df['군집'].map(cluster_names)
+cluster_counts = result_df['군집명'].value_counts().sort_values(ascending=False)
+bar_df = cluster_counts.reset_index()
+bar_df.columns = ['군집 키워드', '문장 수']
+fig = px.bar(bar_df, x='군집 키워드', y='문장 수', title='서술형 응답 군집별 문장 수')
+st.plotly_chart(fig)
 
 
 st.write('응답 결과 분석')
