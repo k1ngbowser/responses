@@ -15,7 +15,6 @@ from matplotlib import font_manager
 import urllib.request
 import os
 import plotly.express as px
-from konlpy.tag import Mecab
 
 
 file_path = '급식 설문조사 전체-1.csv'
@@ -169,12 +168,10 @@ if other_texts:
         for i, txt in enumerate(other_texts, 1):
             st.write(f"{i}. {txt}")
 
-# ------------------ 1. 문장 분리 함수 ------------------
 def split_sentences(text):
     text = re.sub(r'[.?!]', '', text)
     return re.split(r',| |', text)
 
-# ------------------ 2. 군집화 시각화 함수 ------------------
 def cluster_text_responses(df, text_column, n_clusters=9, top_n=5):
     st.subheader("건의사항 응답 군집 분석")
 
