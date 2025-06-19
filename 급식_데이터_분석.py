@@ -189,7 +189,7 @@ def cluster_text_responses(df, text_column, n_clusters=9, top_n=5):
 
     # 문장 임베딩
     with st.spinner("문장 임베딩 중..."):
-        model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2', device='cpu')
+        model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
         embeddings = model.encode(sentences)
 
     # 군집화
