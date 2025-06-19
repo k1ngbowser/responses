@@ -261,6 +261,8 @@ def draw_interactive_heatmap(df, row_var, col_var):
 
     st.plotly_chart(fig, use_container_width=True)
     
+    # 1. 교차표 계산
+    contingency = pd.crosstab(df[row_var], df[col_var])
     # 2. 카이제곱 독립성 검정
     chi2, p, dof, expected = chi2_contingency(contingency)
     v = cramers_v(contingency)
