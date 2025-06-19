@@ -241,14 +241,25 @@ def cramers_v(confusion_matrix):
     k = min(confusion_matrix.shape) - 1
     return np.sqrt(chi2 / (n * k))
 
-def draw_heatmap(df, col1, col2):
-    ctab = pd.crosstab(df[col1], df[col2])
-    fig, ax = plt.subplots()
-    sns.heatmap(ctab, annot=True, fmt='d', cmap='Blues', ax=ax)
-    ax.set_title("잔반량과과 만족도 간 상관관계")
-    st.pyplot(fig)
-        # 1. 교차표 계산
+def draw_interactive_heatmap(df, row_var, col_var):
+    # 교차표 생성 (빈도 수 기준)
     contingency = pd.crosstab(df[row_var], df[col_var])
+    
+    # Plotly 히트맵용 형태로 변환
+    heatmap_df = contingency.reset_index().melt(id_vars=row_var, var_name=col_var, value_name='빈도')
+
+    # Plotly로 히트맵 그리기
+    fig = px.density_heatmap(
+        data_frame=heatmap_df,
+        x=col_var,
+        y=row_var,
+        z='빈도',
+        text_auto=True,
+        color_continuous_scale='Blues',
+        title=f"{row_var} vs {col_var} 히트맵"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
     
     # 2. 카이제곱 독립성 검정
     chi2, p, dof, expected = chi2_contingency(contingency)
@@ -353,5 +364,5 @@ def show_grouped_bar(df, row_var, col_var, title):
 analyze_categorical_relationship(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
 show_facet_bar(df, '잔반 비율', '수면시간', '수면시간과 잔반 비율 관계')
 analyze_categorical_relationship(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
-draw_heatmap(df, '잔반 비율', '이번주 만족도')
+draw_interactive_heatmap(df, '잔반 비율', '이번주 만족도')
 st.write('분석 결과 잔반이 많은 학생일수록 급식에 대한 만족도가 낮음을 확인할 수 있습니다')
