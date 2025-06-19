@@ -102,11 +102,15 @@ def plot_weekday_meals(df, column_name, week_num, menus, title):
 
     weekday_order = ['월요일', '화요일', '수요일', '목요일', '금요일']
     df_plot['요일'] = pd.Categorical(df_plot['요일'], categories=weekday_order, ordered=True)
-    # 모든 요일에 대해 응답 수가 없으면 0으로 채우기
-    df_complete = pd.DataFrame({'요일': weekday_order})
-    df_plot = df_complete.merge(df_plot, on='요일', how='left').fillna({'응답 수': 0})
 
     count_df = df_plot.groupby(['요일', '식단']).size().reset_index(name='응답 수')
+
+       # 빠진 요일 보완 (식단까지 있는 경우는 어려우므로 생략, 요일만 보완)
+    count_df_base = pd.DataFrame({'요일': weekday_order})
+    if count_df.empty:
+        count_df = count_df_base.copy()
+        count_df['식단'] = ''
+        count_df['응답 수'] = 0
 
     fig = px.bar(
         count_df,
