@@ -233,7 +233,21 @@ def cramers_v(confusion_matrix):
 # 📌 상관관계 분석 및 시각화 함수
 def analyze_categorical_relationship(df, row_var, col_var, title):
    
-    # 1. 교차표 계산
+    # 4. Stacked Bar Chart로 시각화
+    st.markdown("### ✅ 응답별 비율 시각화 (Stacked Bar Chart)")
+    proportion_df = pd.crosstab(df[row_var], df[col_var], normalize='index') * 100
+    fig = px.bar(
+        proportion_df,
+        x=proportion_df.index,
+        y=proportion_df.columns,
+        barmode='stack',
+        text_auto='.1f',
+        labels={'value': '비율 (%)', 'index': row_var, 'variable': col_var},
+        title=f"{row_var}에 따른 {col_var} 비율"
+    )
+    fig.update_layout(yaxis_title='비율 (%)', xaxis_title=row_var)
+    st.plotly_chart(fig, use_container_width=True)
+       # 1. 교차표 계산
     contingency = pd.crosstab(df[row_var], df[col_var])
     
     # 2. 카이제곱 독립성 검정
@@ -249,43 +263,31 @@ def analyze_categorical_relationship(df, row_var, col_var, title):
     else:
         st.info("ℹ 통계적으로 유의미한 관계는 확인되지 않았습니다.")
 
-    # 4. Stacked Bar Chart로 시각화
-    st.markdown("### ✅ 응답별 비율 시각화 (Stacked Bar Chart)")
-    proportion_df = pd.crosstab(df[row_var], df[col_var], normalize='index') * 100
-    fig = px.bar(
-        proportion_df,
-        x=proportion_df.index,
-        y=proportion_df.columns,
-        barmode='stack',
-        text_auto='.1f',
-        labels={'value': '비율 (%)', 'index': row_var, 'variable': col_var},
-        title=f"{row_var}에 따른 {col_var} 비율"
-    )
-    fig.update_layout(yaxis_title='비율 (%)', xaxis_title=row_var)
-    st.plotly_chart(fig, use_container_width=True)
-
-def show_stacked_bar(df, row_var, col_var, title):
+def show_facet_bar(df, row_var, col_var, title):
     st.subheader(f"📊 {title}")
-    
-    ctab = pd.crosstab(df[row_var], df[col_var], normalize='index') * 100
-    ctab = ctab.round(1)
-    ctab = ctab[sorted(ctab.columns)]  # 정렬된 열 순서
-
-    fig = px.bar(
-        ctab,
-        x=ctab.index,
-        y=ctab.columns,
-        title=title,
-        labels={'value': '비율 (%)', 'index': row_var},
-        barmode='stack',
-        text_auto='.1f'
-    )
-    fig.update_layout(xaxis_title=row_var, yaxis_title='비율 (%)')
+    fig = px.histogram(df, x=col_var, color=row_var, barmode='group', text_auto=True)
+    fig.update_layout(title=title, xaxis_title=col_var, yaxis_title='응답 수')
     st.plotly_chart(fig, use_container_width=True)
+
+       # 1. 교차표 계산
+    contingency = pd.crosstab(df[row_var], df[col_var])
+    
+    # 2. 카이제곱 독립성 검정
+    chi2, p, dof, expected = chi2_contingency(contingency)
+    v = cramers_v(contingency)
+
+    # 3. 검정 결과 출력
+    st.markdown(f"**Chi² 통계량:** {chi2:.2f}")
+    st.markdown(f"**p-value:** {p:.4f}")
+    st.markdown(f"**Cramér's V (관계 강도):** {v:.3f}")
+    if p < 0.05:
+        st.success("✔ 통계적으로 유의미한 관계입니다.")
+    else:
+        st.info("ℹ 통계적으로 유의미한 관계는 확인되지 않았습니다.")
 
 def show_grouped_bar(df, row_var, col_var, title):
     st.subheader(f"📊 {title}")
-
+        
     ctab = pd.crosstab(df[row_var], df[col_var])
     ctab = ctab[sorted(ctab.columns)]  # 열 정렬
 
@@ -300,8 +302,23 @@ def show_grouped_bar(df, row_var, col_var, title):
     )
     fig.update_layout(xaxis_title=row_var, yaxis_title='응답 수')
     st.plotly_chart(fig, use_container_width=True)
+       # 1. 교차표 계산
+    contingency = pd.crosstab(df[row_var], df[col_var])
+    
+    # 2. 카이제곱 독립성 검정
+    chi2, p, dof, expected = chi2_contingency(contingency)
+    v = cramers_v(contingency)
+
+    # 3. 검정 결과 출력
+    st.markdown(f"**Chi² 통계량:** {chi2:.2f}")
+    st.markdown(f"**p-value:** {p:.4f}")
+    st.markdown(f"**Cramér's V (관계 강도):** {v:.3f}")
+    if p < 0.05:
+        st.success("✔ 통계적으로 유의미한 관계입니다.")
+    else:
+        st.info("ℹ 통계적으로 유의미한 관계는 확인되지 않았습니다.")
 
 analyze_categorical_relationship(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
-analyze_categorical_relationship(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
+show_facet_bar(df, '수면시간', '잔반 비율', '수면시간과 잔반 비율 관계')
 analyze_categorical_relationship(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
-analyze_categorical_relationship(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
+show_grouped_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
