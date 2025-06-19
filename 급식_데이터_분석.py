@@ -331,3 +331,4 @@ analyze_categorical_relationship(df, '아침밥', '이번주 만족도', '아침
 show_facet_bar(df, '잔반 비율', '수면시간', '수면시간과 잔반 비율 관계')
 analyze_categorical_relationship(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
 show_grouped_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
+st.write('분석 결과 잔반이 많은 학생일수록 급식에 대한 만족도가 낮음을 확인할 수 있습니다')
