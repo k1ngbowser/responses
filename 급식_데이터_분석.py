@@ -173,7 +173,7 @@ def split_sentences(text):
     return re.split(r',| |', text)
 
 def cluster_text_responses(df, text_column, n_clusters=9, top_n=5):
-    st.subheader("추가 메뉴와 기타 건의사항항")
+    st.subheader("추가 메뉴와 기타 건의사항")
 
     # 문장 분리
     sentences = []
