@@ -15,6 +15,8 @@ from matplotlib import font_manager
 import urllib.request
 import os
 import plotly.express as px
+from konlpy.tag import Okt
+
 
 file_path = '급식 설문조사 전체-1.csv'
 df = pd.read_csv(file_path, encoding='utf-8')
