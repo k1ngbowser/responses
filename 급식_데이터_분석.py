@@ -170,7 +170,7 @@ if other_texts:
 # ------------------ 1. 문장 분리 함수 ------------------
 def split_sentences(text):
     text = re.sub(r'[.?!]', '', text)
-    return re.split(r',|그리고|또는|및|&|/|또\s+|그리고\s+', text)
+    return re.split(r',', text)
 
 # ------------------ 2. 군집화 시각화 함수 ------------------
 def cluster_text_responses(df, text_column, n_clusters=10, top_n=5):
