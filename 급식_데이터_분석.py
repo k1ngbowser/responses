@@ -168,6 +168,7 @@ if other_texts:
         for i, txt in enumerate(other_texts, 1):
             st.write(f"{i}. {txt}")
 
+
 def split_sentences(text):
     text = re.sub(r'[.?!]', '', text)
     return re.split(r',| |', text)
@@ -241,7 +242,7 @@ def cluster_text_responses(df, text_column, n_clusters=9, top_n=5):
 
 # ------------------ 3. 실행 ------------------
 if '추가 메뉴와 건의사항' in df.columns:
-    cluster_text_responses(df, text_column='추가 메뉴와 건의사항')
+    cluster_text_responses(df, '추가 메뉴와 건의사항')
 else:
     st.warning("데이터프레임에 '추가 메뉴와 건의사항' 컬럼이 없습니다.")
 
