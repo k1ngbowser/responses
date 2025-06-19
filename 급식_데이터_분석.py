@@ -15,7 +15,7 @@ from matplotlib import font_manager
 import urllib.request
 import os
 import plotly.express as px
-from konlpy.tag import Okt
+from konlpy.tag import Mecab
 
 
 file_path = '급식 설문조사 전체-1.csv'
@@ -169,10 +169,10 @@ if other_texts:
         for i, txt in enumerate(other_texts, 1):
             st.write(f"{i}. {txt}")
 
-okt = Okt()
+mecab = Mecab()
 
 def extract_nouns(text):
-    return ' '.join(okt.nouns(text))
+    return ' '.join(mecab.nouns(text))
 
 def split_sentences(text):
     text = re.sub(r'[.?!]', '', text)
