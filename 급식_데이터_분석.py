@@ -78,19 +78,11 @@ week3_menus = [
     "금요일 - 닭갈비, 이상한나라의솜사탕아이스크림"
 ]
 
-def extract_weekday_and_menu(text):
-    match = re.match(r'(월요일|화요일|수요일|목요일|금요일)\s*-\s*(.+)', text.strip())
-    if match:
-        return match.group(1), match.group(2)
-    return '기타', text.strip()
-
-def filter_by_week(menus, target_column):
-    return target_column[target_column.apply(lambda x: any(menu in x for menu in menus))]
-
 def plot_weekday_meals(df, column_name, week_num, menus, title):
     menu_col = df[column_name].dropna().astype(str)
     week_filtered = filter_by_week(menus, menu_col)
 
+    # 요일-식단 추출
     weekday_menu_list = week_filtered.apply(extract_weekday_and_menu)
     weekdays = [w for w, _ in weekday_menu_list]
     meals = [m for _, m in weekday_menu_list]
@@ -100,26 +92,34 @@ def plot_weekday_meals(df, column_name, week_num, menus, title):
         '식단': meals
     })
 
+    # 요일 순서 고정
     weekday_order = ['월요일', '화요일', '수요일', '목요일', '금요일']
     df_plot['요일'] = pd.Categorical(df_plot['요일'], categories=weekday_order, ordered=True)
 
-    count_df = df_plot.groupby(['요일', '식단']).size().reset_index(name='응답 수')
+    # 요일별 식단 그룹별 응답 수 집계
+    count_df = df_plot.groupby(['요일', '식단'], as_index=False).size()
 
-       # 빠진 요일 보완 (식단까지 있는 경우는 어려우므로 생략, 요일만 보완)
-    count_df_base = pd.DataFrame({'요일': weekday_order})
-    if count_df.empty:
-        count_df = count_df_base.copy()
-        count_df['식단'] = ''
-        count_df['응답 수'] = 0
+    # 🧩 누락된 요일 채우기 위한 보완 로직
+    if not count_df.empty:
+        # 누락 요일-식단 조합 보완
+        existing_pairs = set(zip(count_df['요일'], count_df['식단']))
+        full_pairs = set((day, meal) for day in weekday_order for meal in df_plot['식단'].unique())
 
+        missing_pairs = full_pairs - existing_pairs
+        if missing_pairs:
+            fill_rows = pd.DataFrame(missing_pairs, columns=['요일', '식단'])
+            fill_rows['size'] = 0
+            count_df = pd.concat([count_df, fill_rows], ignore_index=True)
+
+    # 시각화
     fig = px.bar(
         count_df,
         x='요일',
-        y='응답 수',
+        y='size',
         color='식단',
-        hover_data={'식단': True, '응답 수': True, '요일': False},
+        hover_data={'식단': True, 'size': True, '요일': False},
         title=f"[{week_num}주차] {title}",
-        labels={'요일': '요일', '응답 수': '응답 수'}
+        labels={'요일': '요일', 'size': '응답 수'}
     )
     fig.update_layout(xaxis_title='요일', yaxis_title='응답 수', showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
