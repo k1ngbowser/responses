@@ -53,70 +53,61 @@ for col in ['이번주 급식이 좋았던 이유','급식을 먹지 않은 이�
         fig = px.pie(pie_data, names=col, values='비율', title=f'{col} 비율', hole=0.4)
         st.plotly_chart(fig)
 
-# ---------------------- 사용자 설정 ----------------------
-week1_menus = [
-    "월요일 - 마라탕, 미니육전, 초코우유",
-    "화요일 - 순대국, 대구까스, 파인애플",
-    "수요일 - 치킨꿔바로우, 찹쌀약과",
-    "목요일 - 찹스테이크, 산양요구르트",
-    "금요일 - 참치마요덮밥, 크리스피 두부스틱, 깔라만시레몬에이드"
+if '이번주 가장 좋았던 급식'and'이번주 가장 싫었던 급식' in df.columns:
+     
+    week1_menus = [
+    "월요일 - 마라탕, 미니육전, 초코우유","금요일 - 참치마요덮밥, 크리스피 두부스틱,깔라만시레몬에이드", "화요일 - 순대국, 대구까스, 파인애플","수요일 - 치킨꿔바로우, 찹쌀약과", "목요일- 찹스테이크, 산양요구르트"
 ]
-
-week2_menus = [
-    "월요일 - 전주식콩나물국밥, 된장불고기, 바나나우유",
-    "화요일 - 냉메밀국수, 알밥, 돈가스, 타코야끼, 주스",
-    "수요일 - 육개장, 탕평채, 웅떡웅떡, 라임레몬주스",
-    "목요일 - 카레라이스, 왕만두, 큐브카프레제, 감자스낵",
-    "금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)"
+    week2_menus = [
+    "월요일 - 전주식콩나물국밥, 된장불고기, 바나나우유", "화요일 - 냉메밀국수, 알밥, 돈가스, 타코야끼, 주스", "수요일 - 육개장, 탕평채, 웅떡웅떡, 라임레몬주스","금요일 - 부대찌개, 닭봉데리야끼구이, 요구르트(애플망고)", "목요일- 카레라이스, 왕만두, 큐브카프레제, 감자스낵"
 ]
-
-week3_menus = [
-    "월요일 - 새우베이컨볶음밥, 감자샐러드, 모닝빵, 자몽에이드", 
-    "화요일 - 대패삼겹버섯구이, 요구르트", 
-    "수요일 - 잔치국수, 오리주물럭, 파인애플",
-    "목요일 - 갈비탕, 오징어김치전, 복숭아주스",
-    "금요일 - 닭갈비, 이상한나라의솜사탕아이스크림"
+    week3_menus = [
+    "월요일 - 새우베이컨볶음밥, 감자샐러드, 모닝빵, 자몽에이드", "화요일 - 대패삼겹버섯구이, 요구르트", "수요일 - 잔치국수, 오리주물럭, 파인애플","목요일- 갈비탕, 오징어김치전, 복숭아주스", "금요일 - 닭갈비, 이상한나라의솜사탕아이스크림"
 ]
+    menu_col = df['이번주 가장 좋았던 급식'].dropna().astype(str)
+    
+    week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
+    week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
+    week3 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week3_menus))]
 
-def extract_weekday_and_menu(text):
-    match = re.match(r'(월요일|화요일|수요일|목요일|금요일)\s*-\s*(.+)', text.strip())
-    if match:
-        return match.group(1), match.group(2)
-    return '기타', text.strip()
+    week_data = {
+        '1주차': week1,
+        '2주차': week2,
+        '3주차': week3
+    }
 
-def filter_by_week(menus, target_column):
-    return target_column[target_column.apply(lambda x: any(menu in x for menu in menus))]
+    for week_name, data in week_data.items():
+        value_counts = data.value_counts().reset_index()
+        value_counts.columns = ['급식', '응답 수']
+        fig = px.bar(
+            value_counts,
+            x='급식', y='응답 수',
+            title=f'[{week_name}] 가장 좋았던 급식', 
+            labels={'급식': '급식 메뉴'}
+        )
+        st.plotly_chart(fig)   
+        
+    menu_col = df['이번주 가장 싫었던 급식'].dropna().astype(str)
+    
+    week1 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week1_menus))]
+    week2 = menu_col[menu_col.apply(lambda x: any(menu in x for menu in week2_menus))]
+   
 
-def plot_weekday_meals(df, column_name, week_num, menus, title):
-    menu_col = df[column_name].dropna().astype(str)
-    week_filtered = filter_by_week(menus, menu_col)
+    week_data = {
+        '1주차': week1,
+        '2주차': week2
+    }
 
-    weekday_menu_list = week_filtered.apply(extract_weekday_and_menu)
-    weekdays = [w for w, _ in weekday_menu_list]
-    meals = [m for _, m in weekday_menu_list]
-
-    df_plot = pd.DataFrame({
-        '요일': weekdays,
-        '식단': meals
-    })
-
-    weekday_order = ['월요일', '화요일', '수요일', '목요일', '금요일']
-    df_plot['요일'] = pd.Categorical(df_plot['요일'], categories=weekday_order, ordered=True)
-
-    count_df = df_plot.groupby(['요일', '식단']).size().reset_index(name='응답 수')
-
-    fig = px.bar(
-        count_df,
-        x='요일',
-        y='응답 수',
-        color='식단',
-        hover_data={'식단': True, '응답 수': True, '요일': False},
-        title=f"[{week_num}주차] {title}",
-        labels={'요일': '요일', '응답 수': '응답 수'}
-    )
-    fig.update_layout(xaxis_title='요일', yaxis_title='응답 수', showlegend=False)
-    st.plotly_chart(fig, use_container_width=True)
-
+    for week_name, data in week_data.items():
+        value_counts = data.value_counts().reset_index()
+        value_counts.columns = ['급식', '응답 수']
+        fig = px.bar(
+            value_counts,
+            x='급식', y='응답 수',
+            title=f'[{week_name}] 가장 싫었던 급식', 
+            labels={'급식': '급식 메뉴'}
+        )
+        st.plotly_chart(fig)
 # ---------------------- Streamlit 실행 영역 ----------------------
 st.title("급식 만족도")
 
