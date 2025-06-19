@@ -241,11 +241,32 @@ def cramers_v(confusion_matrix):
     k = min(confusion_matrix.shape) - 1
     return np.sqrt(chi2 / (n * k))
 
+def draw_heatmap(df, col1, col2):
+    ctab = pd.crosstab(df[col1], df[col2])
+    fig, ax = plt.subplots()
+    sns.heatmap(ctab, annot=True, fmt='d', cmap='Blues', ax=ax)
+    ax.set_title("잔반량과과 만족도 간 상관관계")
+    st.pyplot(fig)
+        # 1. 교차표 계산
+    contingency = pd.crosstab(df[row_var], df[col_var])
+    
+    # 2. 카이제곱 독립성 검정
+    chi2, p, dof, expected = chi2_contingency(contingency)
+    v = cramers_v(contingency)
+
+    # 3. 검정 결과 출력
+    st.markdown(f"**Chi² 통계량:** {chi2:.2f}")
+    st.markdown(f"**p-value:** {p:.4f}")
+    st.markdown(f"**Cramér's V (관계 강도):** {v:.3f}")
+    if p < 0.05:
+        st.success("✔ 통계적으로 유의미한 관계입니다.")
+    else:
+        st.info("ℹ 통계적으로 유의미한 관계는 확인되지 않았습니다.")
+
 # 📌 상관관계 분석 및 시각화 함수
 def analyze_categorical_relationship(df, row_var, col_var, title):
    
     # 4. Stacked Bar Chart로 시각화
-    st.markdown("### ✅ 응답별 비율 시각화 (Stacked Bar Chart)")
     proportion_df = pd.crosstab(df[row_var], df[col_var], normalize='index') * 100
     fig = px.bar(
         proportion_df,
@@ -332,5 +353,5 @@ def show_grouped_bar(df, row_var, col_var, title):
 analyze_categorical_relationship(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
 show_facet_bar(df, '잔반 비율', '수면시간', '수면시간과 잔반 비율 관계')
 analyze_categorical_relationship(df, '수면시간', '이번주 만족도', '수면시간과 만족도 관계')
-show_grouped_bar(df, '잔반 비율', '이번주 만족도', '아침밥 여부와 만족도 관계')
+draw_heatmap(df, '잔반 비율', '이번주 만족도')
 st.write('분석 결과 잔반이 많은 학생일수록 급식에 대한 만족도가 낮음을 확인할 수 있습니다')
