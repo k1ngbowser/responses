@@ -47,7 +47,7 @@ for col in objective_columns:
         st.plotly_chart(fig)
         
 # 파이 차트 시각화
-for col in ['이번주 급식이 좋았던 이유','급식을 먹지 않은 이유','아침을 먹었나요?']:
+for col in ['이번주 급식이 좋았던 이유','급식을 먹지 않은 이유','아침밥']:
     if col in df.columns:
         pie_data = df[col].value_counts().reset_index()
         pie_data.columns = [col, '비율']
