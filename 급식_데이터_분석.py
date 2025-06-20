@@ -216,6 +216,13 @@ for i in range(n_clusters):
     cluster_keyword = feature_names[top_idx]
 
     cluster_names[i] = cluster_keyword
+    
+st.write(f'\n=== [{'추가 메뉴와 건의사항'}] 군집화 결과 (군집 이름 포함) ===')
+unique_originals = cluster_data[['원본문장']].drop_duplicates().reset_index(drop=True)
+    with st.expander(f'[군집 {i} - "{cluster_keyword}"] 응답 보기 (총 {len(unique_originals)}건):'):
+         for j, row in unique_originals.iterrows():
+            st.write(f'- {row["원본문장"]}')
+
 # 군집별 문장 수 시각화 (상위 5개만)
 result_df['군집명'] = result_df['군집'].map(cluster_names)
 cluster_counts = result_df['군집명'].value_counts().sort_values(ascending=False)
@@ -227,11 +234,6 @@ top5_clusters.columns = ['군집 키워드', '문장 수']
 fig = px.bar(top5_clusters, x='군집 키워드', y='문장 수', title='추가 메뉴(상위 5개)')
 st.plotly_chart(fig)
 
-st.write(f'\n=== [{'추가 메뉴와 건의사항'}] 군집화 결과 (군집 이름 포함) ===')
-unique_originals = cluster_data[['원본문장']].drop_duplicates().reset_index(drop=True)
-with st.expander(f'[군집 {i} - "{cluster_keyword}"] 응답 보기 (총 {len(unique_originals)}건):'):
- for j, row in unique_originals.iterrows():
-            st.write(f'- {row["원본문장"]}')
 
 st.write('응답 결과 분석')
 
