@@ -235,7 +235,7 @@ fig = px.bar(top5_clusters, x='군집 키워드', y='문장 수', title='급식�
 st.plotly_chart(fig)
 
 
-st.write('상관관계계 분석')
+st.write('상관관계 분석')
 
 # 📌 Cramér's V 계산 함수
 def cramers_v(confusion_matrix):
@@ -364,7 +364,7 @@ def show_grouped_bar(df, row_var, col_var, title):
     if p < 0.05:
         st.success("✔ 통계적으로 유의미한 관계입니다.")
     else:
-        st.info("ℹ 통계적으로 유의미한 관계는 아닙니.")
+        st.info("ℹ 통계적으로 유의미한 관계는 아닙니다.")
 
 analyze_categorical_relationship(df, '아침밥', '이번주 만족도', '아침밥 여부와 만족도 관계')
 show_facet_bar(df, '잔반 비율', '수면시간', '수면시간과 잔반 비율 관계')
