@@ -172,7 +172,7 @@ if other_texts:
 # 서술형 응답 처리
 def split_sentences(text):
     text = re.sub(r'[.?!]', '', text)
-    return re.split(r',', text)
+    return re.split(r',|그리고|또는|및|&|/|또\s+|그리고\s+', text)
 
 split_texts = []
 original_indices = []
@@ -203,6 +203,7 @@ result_df = pd.DataFrame({
     '원본문장': original_sentences
 })
 
+st.write(f'\n=== [{'추가 메뉴와 건의사항'}] 군집화 결과 (군집 이름 포함) ===')
 cluster_names = {}
 for i in range(n_clusters):
     cluster_data = result_df[result_df['군집'] == i]
@@ -216,11 +217,10 @@ for i in range(n_clusters):
     cluster_keyword = feature_names[top_idx]
 
     cluster_names[i] = cluster_keyword
-    
-st.write(f'\n=== [{'추가 메뉴와 건의사항'}] 군집화 결과 (군집 이름 포함) ===')
-unique_originals = cluster_data[['원본문장']].drop_duplicates().reset_index(drop=True)
-with st.expander(f'[군집 {i} - "{cluster_keyword}"] 응답 보기 (총 {len(unique_originals)}건):'):
-         for j, row in unique_originals.iterrows():
+
+    unique_originals = cluster_data[['원본문장']].drop_duplicates().reset_index(drop=True)
+    with st.expander(f'[군집 {i} - "{cluster_keyword}"] 응답 보기 (총 {len(unique_originals)}건):'):
+        for j, row in unique_originals.iterrows():
             st.write(f'- {row["원본문장"]}')
 
 # 군집별 문장 수 시각화 (상위 5개만)
