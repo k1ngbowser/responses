@@ -192,7 +192,7 @@ model = model.to('cpu')
 embeddings = model.encode(split_texts)
 
 # 군집화 실행
-n_clusters = 9
+n_clusters = 15
 kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
 labels = kmeans.fit_predict(embeddings)
 
@@ -223,12 +223,15 @@ for i in range(n_clusters):
         for j, row in unique_originals.iterrows():
             st.write(f'- {row["원본문장"]}')
 
-# 군집별 문장 수 시각화
+# 군집별 문장 수 시각화 (상위 5개만)
 result_df['군집명'] = result_df['군집'].map(cluster_names)
 cluster_counts = result_df['군집명'].value_counts().sort_values(ascending=False)
-bar_df = cluster_counts.reset_index()
-bar_df.columns = ['군집 키워드', '문장 수']
-fig = px.bar(bar_df, x='군집 키워드', y='문장 수', title='서술형 응답 군집별 문장 수')
+
+# 상위 5개만 선택
+top5_clusters = cluster_counts.head(5).reset_index()
+top5_clusters.columns = ['군집 키워드', '문장 수']
+
+fig = px.bar(top5_clusters, x='군집 키워드', y='문장 수', title='추가 메뉴(상위 5개)')
 st.plotly_chart(fig)
 
 
