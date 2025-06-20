@@ -192,7 +192,7 @@ model = model.to('cpu')
 embeddings = model.encode(split_texts)
 
 # 군집화 실행
-n_clusters = 20
+n_clusters = 17
 kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
 labels = kmeans.fit_predict(embeddings)
 
