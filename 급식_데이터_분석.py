@@ -231,7 +231,7 @@ cluster_counts = result_df['군집명'].value_counts().sort_values(ascending=Fal
 top5_clusters = cluster_counts.head(5).reset_index()
 top5_clusters.columns = ['군집 키워드', '문장 수']
 
-fig = px.bar(top5_clusters, x='군집 키워드', y='문장 수', title='추가 메뉴(상위 5개)')
+fig = px.bar(top5_clusters, x='군집 키워드', y='문장 수', title='급식으로 먹고싶은 메뉴(상위 5개)')
 st.plotly_chart(fig)
 
 
