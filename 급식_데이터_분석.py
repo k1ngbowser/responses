@@ -203,7 +203,7 @@ result_df = pd.DataFrame({
     '원본문장': original_sentences
 })
 
-st.write(f'\n=== [{'추가 메뉴와 건의사항'}] 군집 목록록===')
+st.write(f'\n=== [{'추가 메뉴와 건의사항'}] 군집 목록===')
 cluster_names = {}
 for i in range(n_clusters):
     cluster_data = result_df[result_df['군집'] == i]
