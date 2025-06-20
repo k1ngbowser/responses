@@ -31,7 +31,7 @@ for col in objective_columns:
         fig = px.bar(value_counts, x=col, y='응답 수', title=f'{col} 분포')
         st.plotly_chart(fig)
 
-for col in ['급식 만족도']:
+for col in ['이번주 만족도']:
     if col in df.columns:
         pie_data = df[col].value_counts().reset_index()
         pie_data.columns = [col, '비율']
