@@ -23,12 +23,12 @@ df = pd.read_csv(file_path, encoding='utf-8')
 st.write('급식 설문조사 응답 결과/결과 분석')
 
 # 객관식 항목 시각화
-objective_columns = ['응답자 분포']
+objective_columns = ['학년']
 for col in objective_columns:
     if col in df.columns:
         value_counts = df[col].value_counts().reset_index()
         value_counts.columns = [col, '응답 수']
-        fig = px.bar(value_counts, x=col, y='응답 수', title=f'{col} 응답 분포')
+        fig = px.bar(value_counts, x=col, y='응답 수', title=f'{col} 분포')
         st.plotly_chart(fig)
 
 for col in ['급식 만족도']:
